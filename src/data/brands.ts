@@ -1,0 +1,31 @@
+/** Brands seen in the researched catalog. Presence here is not a stock claim. */
+export const brands = [
+  "ASUS",
+  "MSI",
+  "Gigabyte",
+  "AMD",
+  "Intel",
+  "NVIDIA",
+  "Sapphire",
+  "Dell",
+  "Acer",
+  "Microsoft",
+  "Xiaomi",
+  "HyperX",
+  "Razer",
+  "Logitech",
+  "Kingston",
+  "Samsung",
+  "ADATA",
+  "Netac",
+  "Arctic",
+  "DeepCool",
+  "Antec",
+  "Mars Gaming",
+  "Redragon",
+  "UGREEN",
+  "Tenda",
+  "Wacom",
+] as const;
+
+export type Brand = (typeof brands)[number];
