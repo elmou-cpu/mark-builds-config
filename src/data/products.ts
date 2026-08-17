@@ -63,7 +63,7 @@ function make(d: Draft): Product {
     brand: d.brand,
     category: d.category,
     price: d.price,
-    oldPrice: d.oldPrice,
+    ...(d.oldPrice !== undefined ? { oldPrice: d.oldPrice } : {}),
     currency: "DZD",
     image,
     images: [image, defaultImage[d.category], img.parts],
@@ -71,15 +71,16 @@ function make(d: Draft): Product {
       d.description ??
       `${d.brand} ${d.name} — matériel proposé par Mark Computer. Fiche de démonstration : contactez le magasin pour la disponibilité et les détails exacts.`,
     specifications: d.specifications ?? {},
-    attributes: d.attributes,
+    ...(d.attributes ? { attributes: d.attributes } : {}),
     stock: d.stock ?? (status === "disponible" ? 5 : 0),
     status,
     condition: d.condition ?? "neuf",
-    badge: d.badge,
+    ...(d.badge ? { badge: d.badge } : {}),
     sku: `MC-${String(n).padStart(4, "0")}`,
     tags: d.tags ?? [],
     rating: d.rating ?? 4.5,
-    featured: d.featured,
+    ...(d.featured !== undefined ? { featured: d.featured } : {}),
+
   };
 }
 
