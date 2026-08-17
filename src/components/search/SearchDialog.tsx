@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { Command as CommandPrimitive } from "cmdk";
 import { Search, Clock, Flame } from "lucide-react";
 
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
-  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
@@ -49,74 +50,84 @@ export function SearchDialog({
     if (query.trim()) remember(query.trim());
     onOpenChange(false);
     setQuery("");
-    navigate({ to: "/produits/$slug", params: { slug } });
+    void navigate({ to: "/produits/$slug", params: { slug } });
   };
 
   const runSearch = (term: string) => {
     remember(term);
     onOpenChange(false);
     setQuery("");
-    navigate({ to: "/produits", search: { q: term } });
+    void navigate({ to: "/produits", search: { q: term } });
   };
 
   return (
-    <CommandDialog open={open} onOpenChange={onOpenChange} shouldFilter={false}>
-      <CommandInput
-        value={query}
-        onValueChange={setQuery}
-        placeholder="Rechercher un produit, une marque, un composant…"
-      />
-      <CommandList className="max-h-[60vh]">
-        {query.trim() && results.length === 0 && (
-          <CommandEmpty>Aucun produit trouvé pour « {query} ».</CommandEmpty>
-        )}
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="overflow-hidden p-0">
+        <DialogTitle className="sr-only">Recherche</DialogTitle>
+        <CommandPrimitive
+          shouldFilter={false}
+          className="flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground"
+        >
+          <CommandInput
+            value={query}
+            onValueChange={setQuery}
+            placeholder="Rechercher un produit, une marque, un composant…"
+          />
+          <CommandList className="max-h-[60vh]">
+            {query.trim() && results.length === 0 && (
+              <CommandEmpty>Aucun produit trouvé pour « {query} ».</CommandEmpty>
+            )}
 
-        {results.length > 0 && (
-          <CommandGroup heading="Produits">
-            {results.map((p) => (
-              <CommandItem key={p.id} value={p.id} onSelect={() => openProduct(p.slug)}>
-                <img src={p.image} alt="" className="mr-3 h-9 w-9 rounded object-cover" />
-                <span className="min-w-0 flex-1 truncate">
-                  <span className="text-xs text-muted-foreground">{p.brand} · </span>
-                  {p.name}
-                </span>
-                <span className="ml-3 shrink-0 text-xs font-semibold">{formatPrice(p.price)}</span>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
+            {results.length > 0 && (
+              <CommandGroup heading="Produits">
+                {results.map((p) => (
+                  <CommandItem key={p.id} value={p.id} onSelect={() => openProduct(p.slug)}>
+                    <img src={p.image} alt="" className="mr-3 h-9 w-9 rounded object-cover" />
+                    <span className="min-w-0 flex-1 truncate">
+                      <span className="text-xs text-muted-foreground">{p.brand} · </span>
+                      {p.name}
+                    </span>
+                    <span className="ml-3 shrink-0 text-xs font-semibold">
+                      {formatPrice(p.price)}
+                    </span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
 
-        {query.trim() && results.length > 0 && (
-          <CommandGroup>
-            <CommandItem value="all-results" onSelect={() => runSearch(query.trim())}>
-              <Search className="mr-2 h-4 w-4" />
-              Voir tous les résultats pour « {query} »
-            </CommandItem>
-          </CommandGroup>
-        )}
+            {query.trim() && results.length > 0 && (
+              <CommandGroup>
+                <CommandItem value="all-results" onSelect={() => runSearch(query.trim())}>
+                  <Search className="mr-2 h-4 w-4" />
+                  Voir tous les résultats pour « {query} »
+                </CommandItem>
+              </CommandGroup>
+            )}
 
-        {!query.trim() && recent.length > 0 && (
-          <CommandGroup heading="Recherches récentes">
-            {recent.map((term) => (
-              <CommandItem key={term} value={`recent-${term}`} onSelect={() => runSearch(term)}>
-                <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
-                {term}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
+            {!query.trim() && recent.length > 0 && (
+              <CommandGroup heading="Recherches récentes">
+                {recent.map((term) => (
+                  <CommandItem key={term} value={`recent-${term}`} onSelect={() => runSearch(term)}>
+                    <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+                    {term}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
 
-        {!query.trim() && (
-          <CommandGroup heading="Recherches populaires">
-            {POPULAR.map((term) => (
-              <CommandItem key={term} value={`pop-${term}`} onSelect={() => runSearch(term)}>
-                <Flame className="mr-2 h-4 w-4 text-brand-purple" />
-                {term}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
-      </CommandList>
-    </CommandDialog>
+            {!query.trim() && (
+              <CommandGroup heading="Recherches populaires">
+                {POPULAR.map((term) => (
+                  <CommandItem key={term} value={`pop-${term}`} onSelect={() => runSearch(term)}>
+                    <Flame className="mr-2 h-4 w-4 text-brand-purple" />
+                    {term}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
+          </CommandList>
+        </CommandPrimitive>
+      </DialogContent>
+    </Dialog>
   );
 }
