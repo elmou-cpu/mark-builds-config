@@ -100,7 +100,7 @@ export function checkCompatibility(sel: Selection): CompatCheck[] {
   checks.push(
     !cooling || !cpu
       ? { label: "Refroidissement CPU", state: "idle", detail: "Sélectionnez CPU et refroidissement." }
-      : str(cooling.attributes['socket']s).includes(str(cpu.attributes['socket']))
+      : str(cooling.attributes['sockets']).includes(str(cpu.attributes['socket']))
         ? { label: "Refroidissement CPU", state: "ok", detail: `Compatible ${str(cpu.attributes['socket'])}` }
         : {
             label: "Refroidissement CPU",
