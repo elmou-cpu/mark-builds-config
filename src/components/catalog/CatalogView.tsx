@@ -35,9 +35,9 @@ export function CatalogView({
   showCategories = true,
 }: {
   products: Product[];
-  initialCategory?: string;
-  initialQuery?: string;
-  showCategories?: boolean;
+  initialCategory?: string | undefined;
+  initialQuery?: string | undefined;
+  showCategories?: boolean | undefined;
 }) {
   const bounds = useMemo(() => priceBounds(products), [products]);
   const [filters, setFilters] = useState<Filters>(() => ({

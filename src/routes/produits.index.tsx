@@ -6,9 +6,9 @@ import { products } from "@/data/products";
 import { categoryMap } from "@/data/categories";
 
 export const Route = createFileRoute("/produits/")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    q: typeof search.q === "string" ? search.q : undefined,
-    categorie: typeof search.categorie === "string" ? search.categorie : undefined,
+  validateSearch: (search: Record<string, unknown>): { q?: string; categorie?: string } => ({
+    ...(typeof search["q"] === "string" ? { q: search["q"] } : {}),
+    ...(typeof search["categorie"] === "string" ? { categorie: search["categorie"] } : {}),
   }),
   head: () => ({
     meta: [
