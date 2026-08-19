@@ -10,33 +10,74 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GamingRouteImport } from './routes/gaming'
+import { Route as LaptopsRouteImport } from './routes/laptops'
+import { Route as ProduitsIndexRouteImport } from './routes/produits.index'
+import { Route as ProduitsSlugRouteImport } from './routes/produits.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GamingRoute = GamingRouteImport.update({
+  id: '/gaming',
+  path: '/gaming',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LaptopsRoute = LaptopsRouteImport.update({
+  id: '/laptops',
+  path: '/laptops',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProduitsIndexRoute = ProduitsIndexRouteImport.update({
+  id: '/produits/',
+  path: '/produits/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProduitsSlugRoute = ProduitsSlugRouteImport.update({
+  id: '/produits/$slug',
+  path: '/produits/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/gaming': typeof GamingRoute
+  '/laptops': typeof LaptopsRoute
+  '/produits/$slug': typeof ProduitsSlugRoute
+  '/produits/': typeof ProduitsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/gaming': typeof GamingRoute
+  '/laptops': typeof LaptopsRoute
+  '/produits/$slug': typeof ProduitsSlugRoute
+  '/produits': typeof ProduitsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/gaming': typeof GamingRoute
+  '/laptops': typeof LaptopsRoute
+  '/produits/$slug': typeof ProduitsSlugRoute
+  '/produits/': typeof ProduitsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/gaming' | '/laptops' | '/produits/$slug' | '/produits/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/gaming' | '/laptops' | '/produits/$slug' | '/produits'
+  id:
+    '__root__' | '/' | '/gaming' | '/laptops' | '/produits/$slug' | '/produits/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GamingRoute: typeof GamingRoute
+  LaptopsRoute: typeof LaptopsRoute
+  ProduitsSlugRoute: typeof ProduitsSlugRoute
+  ProduitsIndexRoute: typeof ProduitsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +89,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gaming': {
+      id: '/gaming'
+      path: '/gaming'
+      fullPath: '/gaming'
+      preLoaderRoute: typeof GamingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/laptops': {
+      id: '/laptops'
+      path: '/laptops'
+      fullPath: '/laptops'
+      preLoaderRoute: typeof LaptopsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/produits/': {
+      id: '/produits/'
+      path: '/produits'
+      fullPath: '/produits/'
+      preLoaderRoute: typeof ProduitsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/produits/$slug': {
+      id: '/produits/$slug'
+      path: '/produits/$slug'
+      fullPath: '/produits/$slug'
+      preLoaderRoute: typeof ProduitsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GamingRoute: GamingRoute,
+  LaptopsRoute: LaptopsRoute,
+  ProduitsSlugRoute: ProduitsSlugRoute,
+  ProduitsIndexRoute: ProduitsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
