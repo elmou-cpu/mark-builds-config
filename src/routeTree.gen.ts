@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GamingRouteImport } from './routes/gaming'
 import { Route as LaptopsRouteImport } from './routes/laptops'
+import { Route as OccasionRouteImport } from './routes/occasion'
+import { Route as PcBuilderRouteImport } from './routes/pc-builder'
+import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as ProduitsIndexRouteImport } from './routes/produits.index'
 import { Route as ProduitsSlugRouteImport } from './routes/produits.$slug'
 
@@ -30,6 +33,21 @@ const LaptopsRoute = LaptopsRouteImport.update({
   path: '/laptops',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OccasionRoute = OccasionRouteImport.update({
+  id: '/occasion',
+  path: '/occasion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PcBuilderRoute = PcBuilderRouteImport.update({
+  id: '/pc-builder',
+  path: '/pc-builder',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromotionsRoute = PromotionsRouteImport.update({
+  id: '/promotions',
+  path: '/promotions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProduitsIndexRoute = ProduitsIndexRouteImport.update({
   id: '/produits/',
   path: '/produits/',
@@ -45,6 +63,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/gaming': typeof GamingRoute
   '/laptops': typeof LaptopsRoute
+  '/occasion': typeof OccasionRoute
+  '/pc-builder': typeof PcBuilderRoute
+  '/promotions': typeof PromotionsRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/produits/': typeof ProduitsIndexRoute
 }
@@ -52,6 +73,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/gaming': typeof GamingRoute
   '/laptops': typeof LaptopsRoute
+  '/occasion': typeof OccasionRoute
+  '/pc-builder': typeof PcBuilderRoute
+  '/promotions': typeof PromotionsRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/produits': typeof ProduitsIndexRoute
 }
@@ -60,22 +84,52 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/gaming': typeof GamingRoute
   '/laptops': typeof LaptopsRoute
+  '/occasion': typeof OccasionRoute
+  '/pc-builder': typeof PcBuilderRoute
+  '/promotions': typeof PromotionsRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/produits/': typeof ProduitsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/gaming' | '/laptops' | '/produits/$slug' | '/produits/'
+  fullPaths:
+    | '/'
+    | '/gaming'
+    | '/laptops'
+    | '/occasion'
+    | '/pc-builder'
+    | '/promotions'
+    | '/produits/$slug'
+    | '/produits/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/gaming' | '/laptops' | '/produits/$slug' | '/produits'
+  to:
+    | '/'
+    | '/gaming'
+    | '/laptops'
+    | '/occasion'
+    | '/pc-builder'
+    | '/promotions'
+    | '/produits/$slug'
+    | '/produits'
   id:
-    '__root__' | '/' | '/gaming' | '/laptops' | '/produits/$slug' | '/produits/'
+    | '__root__'
+    | '/'
+    | '/gaming'
+    | '/laptops'
+    | '/occasion'
+    | '/pc-builder'
+    | '/promotions'
+    | '/produits/$slug'
+    | '/produits/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GamingRoute: typeof GamingRoute
   LaptopsRoute: typeof LaptopsRoute
+  OccasionRoute: typeof OccasionRoute
+  PcBuilderRoute: typeof PcBuilderRoute
+  PromotionsRoute: typeof PromotionsRoute
   ProduitsSlugRoute: typeof ProduitsSlugRoute
   ProduitsIndexRoute: typeof ProduitsIndexRoute
 }
@@ -103,6 +157,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LaptopsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/occasion': {
+      id: '/occasion'
+      path: '/occasion'
+      fullPath: '/occasion'
+      preLoaderRoute: typeof OccasionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pc-builder': {
+      id: '/pc-builder'
+      path: '/pc-builder'
+      fullPath: '/pc-builder'
+      preLoaderRoute: typeof PcBuilderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promotions': {
+      id: '/promotions'
+      path: '/promotions'
+      fullPath: '/promotions'
+      preLoaderRoute: typeof PromotionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/produits/': {
       id: '/produits/'
       path: '/produits'
@@ -124,6 +199,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GamingRoute: GamingRoute,
   LaptopsRoute: LaptopsRoute,
+  OccasionRoute: OccasionRoute,
+  PcBuilderRoute: PcBuilderRoute,
+  PromotionsRoute: PromotionsRoute,
   ProduitsSlugRoute: ProduitsSlugRoute,
   ProduitsIndexRoute: ProduitsIndexRoute,
 }
