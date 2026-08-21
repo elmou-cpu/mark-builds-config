@@ -29,7 +29,11 @@ export const Route = createFileRoute("/occasion")({
 const points = [
   { icon: Wrench, title: "Testé en atelier", text: "Chaque pièce passe un test de fonctionnement." },
   { icon: ShieldCheck, title: "État annoncé", text: "Occasion ou comme neuf, indiqué sur la fiche." },
-  { icon: RefreshCw, title: "Reprise possible", text: "Nous étudions la reprise de votre ancien matériel." },
+  {
+    icon: RefreshCw,
+    title: "Reprise possible",
+    text: "Nous étudions la reprise de votre ancien matériel.",
+  },
 ];
 
 function UsedPage() {

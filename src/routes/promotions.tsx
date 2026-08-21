@@ -39,7 +39,10 @@ function DealsPage() {
       </p>
 
       <div className="mt-12">
-        <SectionHeading eyebrow={`${dealProducts.length} produits remisés`} title="Sélection en promotion" />
+        <SectionHeading
+          eyebrow={`${dealProducts.length} produits remisés`}
+          title="Sélection en promotion"
+        />
         <div className="mt-8">
           <CatalogView products={dealProducts} />
         </div>

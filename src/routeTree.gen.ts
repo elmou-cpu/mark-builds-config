@@ -10,9 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AProposRouteImport } from './routes/a-propos'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as FavorisRouteImport } from './routes/favoris'
 import { Route as GamingRouteImport } from './routes/gaming'
 import { Route as LaptopsRouteImport } from './routes/laptops'
 import { Route as OccasionRouteImport } from './routes/occasion'
+import { Route as PanierRouteImport } from './routes/panier'
 import { Route as PcBuilderRouteImport } from './routes/pc-builder'
 import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as ProduitsIndexRouteImport } from './routes/produits.index'
@@ -21,6 +25,21 @@ import { Route as ProduitsSlugRouteImport } from './routes/produits.$slug'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AProposRoute = AProposRouteImport.update({
+  id: '/a-propos',
+  path: '/a-propos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavorisRoute = FavorisRouteImport.update({
+  id: '/favoris',
+  path: '/favoris',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamingRoute = GamingRouteImport.update({
@@ -36,6 +55,11 @@ const LaptopsRoute = LaptopsRouteImport.update({
 const OccasionRoute = OccasionRouteImport.update({
   id: '/occasion',
   path: '/occasion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PanierRoute = PanierRouteImport.update({
+  id: '/panier',
+  path: '/panier',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PcBuilderRoute = PcBuilderRouteImport.update({
@@ -61,9 +85,13 @@ const ProduitsSlugRoute = ProduitsSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
+  '/contact': typeof ContactRoute
+  '/favoris': typeof FavorisRoute
   '/gaming': typeof GamingRoute
   '/laptops': typeof LaptopsRoute
   '/occasion': typeof OccasionRoute
+  '/panier': typeof PanierRoute
   '/pc-builder': typeof PcBuilderRoute
   '/promotions': typeof PromotionsRoute
   '/produits/$slug': typeof ProduitsSlugRoute
@@ -71,9 +99,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
+  '/contact': typeof ContactRoute
+  '/favoris': typeof FavorisRoute
   '/gaming': typeof GamingRoute
   '/laptops': typeof LaptopsRoute
   '/occasion': typeof OccasionRoute
+  '/panier': typeof PanierRoute
   '/pc-builder': typeof PcBuilderRoute
   '/promotions': typeof PromotionsRoute
   '/produits/$slug': typeof ProduitsSlugRoute
@@ -82,9 +114,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
+  '/contact': typeof ContactRoute
+  '/favoris': typeof FavorisRoute
   '/gaming': typeof GamingRoute
   '/laptops': typeof LaptopsRoute
   '/occasion': typeof OccasionRoute
+  '/panier': typeof PanierRoute
   '/pc-builder': typeof PcBuilderRoute
   '/promotions': typeof PromotionsRoute
   '/produits/$slug': typeof ProduitsSlugRoute
@@ -94,9 +130,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/a-propos'
+    | '/contact'
+    | '/favoris'
     | '/gaming'
     | '/laptops'
     | '/occasion'
+    | '/panier'
     | '/pc-builder'
     | '/promotions'
     | '/produits/$slug'
@@ -104,9 +144,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/a-propos'
+    | '/contact'
+    | '/favoris'
     | '/gaming'
     | '/laptops'
     | '/occasion'
+    | '/panier'
     | '/pc-builder'
     | '/promotions'
     | '/produits/$slug'
@@ -114,9 +158,13 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/a-propos'
+    | '/contact'
+    | '/favoris'
     | '/gaming'
     | '/laptops'
     | '/occasion'
+    | '/panier'
     | '/pc-builder'
     | '/promotions'
     | '/produits/$slug'
@@ -125,9 +173,13 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AProposRoute: typeof AProposRoute
+  ContactRoute: typeof ContactRoute
+  FavorisRoute: typeof FavorisRoute
   GamingRoute: typeof GamingRoute
   LaptopsRoute: typeof LaptopsRoute
   OccasionRoute: typeof OccasionRoute
+  PanierRoute: typeof PanierRoute
   PcBuilderRoute: typeof PcBuilderRoute
   PromotionsRoute: typeof PromotionsRoute
   ProduitsSlugRoute: typeof ProduitsSlugRoute
@@ -141,6 +193,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/a-propos': {
+      id: '/a-propos'
+      path: '/a-propos'
+      fullPath: '/a-propos'
+      preLoaderRoute: typeof AProposRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favoris': {
+      id: '/favoris'
+      path: '/favoris'
+      fullPath: '/favoris'
+      preLoaderRoute: typeof FavorisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gaming': {
@@ -162,6 +235,13 @@ declare module '@tanstack/react-router' {
       path: '/occasion'
       fullPath: '/occasion'
       preLoaderRoute: typeof OccasionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/panier': {
+      id: '/panier'
+      path: '/panier'
+      fullPath: '/panier'
+      preLoaderRoute: typeof PanierRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pc-builder': {
@@ -197,9 +277,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AProposRoute: AProposRoute,
+  ContactRoute: ContactRoute,
+  FavorisRoute: FavorisRoute,
   GamingRoute: GamingRoute,
   LaptopsRoute: LaptopsRoute,
   OccasionRoute: OccasionRoute,
+  PanierRoute: PanierRoute,
   PcBuilderRoute: PcBuilderRoute,
   PromotionsRoute: PromotionsRoute,
   ProduitsSlugRoute: ProduitsSlugRoute,

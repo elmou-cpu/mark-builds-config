@@ -100,9 +100,13 @@ function BuilderPage() {
       toast.info("Ces pièces se commandent en magasin : appelez-nous pour finaliser.");
       return;
     }
-    toast.success(`${added} composant${added > 1 ? "s" : ""} ajouté${added > 1 ? "s" : ""} au panier`);
+    toast.success(
+      `${added} composant${added > 1 ? "s" : ""} ajouté${added > 1 ? "s" : ""} au panier`,
+    );
     setCartOpen(true);
   };
+
+  const activeLabel = builderSteps.find((s) => s.id === activeStep)?.label ?? "Composant";
 
   return (
     <div className="container py-10">
@@ -113,11 +117,11 @@ function BuilderPage() {
         <h1 className="mt-5 text-3xl font-bold sm:text-4xl">Montez votre PC, pièce par pièce</h1>
         <p className="mt-3 text-sm text-muted-foreground sm:text-base">
           Sélectionnez chaque composant : nous vérifions les points de compatibilité essentiels et
-          estimons la consommation. Vérification finale toujours confirmée par nos techniciens.
+          estimons la consommation. La validation finale est toujours faite par nos techniciens.
         </p>
       </div>
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-[240px_minmax(0,1fr)_320px]">
+      <div className="mt-10 grid gap-8 lg:grid-cols-[240px_minmax(0,1fr)] xl:grid-cols-[240px_minmax(0,1fr)_320px]">
         <aside className="lg:sticky lg:top-28 lg:self-start">
           <div className="mb-4">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -146,7 +150,9 @@ function BuilderPage() {
                     <span
                       className={cn(
                         "grid h-6 w-6 shrink-0 place-items-center rounded-full text-[0.65rem] font-bold",
-                        chosen ? "gradient-brand text-primary-foreground" : "bg-surface-2 text-muted-foreground",
+                        chosen
+                          ? "gradient-brand text-primary-foreground"
+                          : "bg-surface-2 text-muted-foreground",
                       )}
                     >
                       {chosen ? <Check className="h-3.5 w-3.5" /> : i + 1}
@@ -169,7 +175,7 @@ function BuilderPage() {
 
         <section className="min-w-0">
           <SectionHeading
-            title={builderSteps.find((s) => s.id === activeStep)?.label ?? "Composant"}
+            title={activeLabel}
             subtitle={`${options.length} option${options.length > 1 ? "s" : ""} disponible${options.length > 1 ? "s" : ""}`}
             action={
               selection[activeStep] ? (
@@ -211,7 +217,9 @@ function BuilderPage() {
                       {option.brand}
                     </span>
                     <span className="block truncate text-sm font-semibold">{option.name}</span>
-                    <span className="block truncate text-xs text-muted-foreground">{option.spec}</span>
+                    <span className="block truncate text-xs text-muted-foreground">
+                      {option.spec}
+                    </span>
                   </span>
                   <span className="shrink-0 text-right">
                     <span className="block font-display text-sm font-bold">
@@ -229,7 +237,7 @@ function BuilderPage() {
           </div>
         </section>
 
-        <aside className="lg:sticky lg:top-28 lg:self-start">
+        <aside className="xl:sticky xl:top-28 xl:self-start">
           <div className="rounded-xl border border-border bg-surface/60 p-5">
             <h2 className="font-display text-lg font-bold">Votre configuration</h2>
 
