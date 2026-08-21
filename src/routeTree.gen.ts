@@ -15,7 +15,9 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FavorisRouteImport } from './routes/favoris'
 import { Route as GamingRouteImport } from './routes/gaming'
 import { Route as LaptopsRouteImport } from './routes/laptops'
+import { Route as OccasionRouteImport } from './routes/occasion'
 import { Route as PanierRouteImport } from './routes/panier'
+import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as ProduitsIndexRouteImport } from './routes/produits.index'
 import { Route as ProduitsSlugRouteImport } from './routes/produits.$slug'
 
@@ -49,9 +51,19 @@ const LaptopsRoute = LaptopsRouteImport.update({
   path: '/laptops',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OccasionRoute = OccasionRouteImport.update({
+  id: '/occasion',
+  path: '/occasion',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PanierRoute = PanierRouteImport.update({
   id: '/panier',
   path: '/panier',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromotionsRoute = PromotionsRouteImport.update({
+  id: '/promotions',
+  path: '/promotions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProduitsIndexRoute = ProduitsIndexRouteImport.update({
@@ -72,7 +84,9 @@ export interface FileRoutesByFullPath {
   '/favoris': typeof FavorisRoute
   '/gaming': typeof GamingRoute
   '/laptops': typeof LaptopsRoute
+  '/occasion': typeof OccasionRoute
   '/panier': typeof PanierRoute
+  '/promotions': typeof PromotionsRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/produits/': typeof ProduitsIndexRoute
 }
@@ -83,7 +97,9 @@ export interface FileRoutesByTo {
   '/favoris': typeof FavorisRoute
   '/gaming': typeof GamingRoute
   '/laptops': typeof LaptopsRoute
+  '/occasion': typeof OccasionRoute
   '/panier': typeof PanierRoute
+  '/promotions': typeof PromotionsRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/produits': typeof ProduitsIndexRoute
 }
@@ -95,7 +111,9 @@ export interface FileRoutesById {
   '/favoris': typeof FavorisRoute
   '/gaming': typeof GamingRoute
   '/laptops': typeof LaptopsRoute
+  '/occasion': typeof OccasionRoute
   '/panier': typeof PanierRoute
+  '/promotions': typeof PromotionsRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/produits/': typeof ProduitsIndexRoute
 }
@@ -108,7 +126,9 @@ export interface FileRouteTypes {
     | '/favoris'
     | '/gaming'
     | '/laptops'
+    | '/occasion'
     | '/panier'
+    | '/promotions'
     | '/produits/$slug'
     | '/produits/'
   fileRoutesByTo: FileRoutesByTo
@@ -119,7 +139,9 @@ export interface FileRouteTypes {
     | '/favoris'
     | '/gaming'
     | '/laptops'
+    | '/occasion'
     | '/panier'
+    | '/promotions'
     | '/produits/$slug'
     | '/produits'
   id:
@@ -130,7 +152,9 @@ export interface FileRouteTypes {
     | '/favoris'
     | '/gaming'
     | '/laptops'
+    | '/occasion'
     | '/panier'
+    | '/promotions'
     | '/produits/$slug'
     | '/produits/'
   fileRoutesById: FileRoutesById
@@ -142,7 +166,9 @@ export interface RootRouteChildren {
   FavorisRoute: typeof FavorisRoute
   GamingRoute: typeof GamingRoute
   LaptopsRoute: typeof LaptopsRoute
+  OccasionRoute: typeof OccasionRoute
   PanierRoute: typeof PanierRoute
+  PromotionsRoute: typeof PromotionsRoute
   ProduitsSlugRoute: typeof ProduitsSlugRoute
   ProduitsIndexRoute: typeof ProduitsIndexRoute
 }
@@ -191,11 +217,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LaptopsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/occasion': {
+      id: '/occasion'
+      path: '/occasion'
+      fullPath: '/occasion'
+      preLoaderRoute: typeof OccasionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/panier': {
       id: '/panier'
       path: '/panier'
       fullPath: '/panier'
       preLoaderRoute: typeof PanierRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promotions': {
+      id: '/promotions'
+      path: '/promotions'
+      fullPath: '/promotions'
+      preLoaderRoute: typeof PromotionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/produits/': {
@@ -222,7 +262,9 @@ const rootRouteChildren: RootRouteChildren = {
   FavorisRoute: FavorisRoute,
   GamingRoute: GamingRoute,
   LaptopsRoute: LaptopsRoute,
+  OccasionRoute: OccasionRoute,
   PanierRoute: PanierRoute,
+  PromotionsRoute: PromotionsRoute,
   ProduitsSlugRoute: ProduitsSlugRoute,
   ProduitsIndexRoute: ProduitsIndexRoute,
 }
