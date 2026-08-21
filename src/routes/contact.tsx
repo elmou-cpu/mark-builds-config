@@ -82,7 +82,7 @@ function ContactPage() {
             </div>
             <div className="grid gap-2 sm:col-span-2">
               <Label htmlFor="subject">Sujet</Label>
-              <Select defaultValue={subjects[0]}>
+              <Select defaultValue="Demande de devis">
                 <SelectTrigger id="subject">
                   <SelectValue />
                 </SelectTrigger>

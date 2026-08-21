@@ -10,14 +10,33 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AProposRouteImport } from './routes/a-propos'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as FavorisRouteImport } from './routes/favoris'
 import { Route as GamingRouteImport } from './routes/gaming'
 import { Route as LaptopsRouteImport } from './routes/laptops'
+import { Route as PanierRouteImport } from './routes/panier'
 import { Route as ProduitsIndexRouteImport } from './routes/produits.index'
 import { Route as ProduitsSlugRouteImport } from './routes/produits.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AProposRoute = AProposRouteImport.update({
+  id: '/a-propos',
+  path: '/a-propos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavorisRoute = FavorisRouteImport.update({
+  id: '/favoris',
+  path: '/favoris',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamingRoute = GamingRouteImport.update({
@@ -28,6 +47,11 @@ const GamingRoute = GamingRouteImport.update({
 const LaptopsRoute = LaptopsRouteImport.update({
   id: '/laptops',
   path: '/laptops',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PanierRoute = PanierRouteImport.update({
+  id: '/panier',
+  path: '/panier',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProduitsIndexRoute = ProduitsIndexRouteImport.update({
@@ -43,39 +67,82 @@ const ProduitsSlugRoute = ProduitsSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
+  '/contact': typeof ContactRoute
+  '/favoris': typeof FavorisRoute
   '/gaming': typeof GamingRoute
   '/laptops': typeof LaptopsRoute
+  '/panier': typeof PanierRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/produits/': typeof ProduitsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
+  '/contact': typeof ContactRoute
+  '/favoris': typeof FavorisRoute
   '/gaming': typeof GamingRoute
   '/laptops': typeof LaptopsRoute
+  '/panier': typeof PanierRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/produits': typeof ProduitsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
+  '/contact': typeof ContactRoute
+  '/favoris': typeof FavorisRoute
   '/gaming': typeof GamingRoute
   '/laptops': typeof LaptopsRoute
+  '/panier': typeof PanierRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/produits/': typeof ProduitsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/gaming' | '/laptops' | '/produits/$slug' | '/produits/'
+  fullPaths:
+    | '/'
+    | '/a-propos'
+    | '/contact'
+    | '/favoris'
+    | '/gaming'
+    | '/laptops'
+    | '/panier'
+    | '/produits/$slug'
+    | '/produits/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/gaming' | '/laptops' | '/produits/$slug' | '/produits'
+  to:
+    | '/'
+    | '/a-propos'
+    | '/contact'
+    | '/favoris'
+    | '/gaming'
+    | '/laptops'
+    | '/panier'
+    | '/produits/$slug'
+    | '/produits'
   id:
-    '__root__' | '/' | '/gaming' | '/laptops' | '/produits/$slug' | '/produits/'
+    | '__root__'
+    | '/'
+    | '/a-propos'
+    | '/contact'
+    | '/favoris'
+    | '/gaming'
+    | '/laptops'
+    | '/panier'
+    | '/produits/$slug'
+    | '/produits/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AProposRoute: typeof AProposRoute
+  ContactRoute: typeof ContactRoute
+  FavorisRoute: typeof FavorisRoute
   GamingRoute: typeof GamingRoute
   LaptopsRoute: typeof LaptopsRoute
+  PanierRoute: typeof PanierRoute
   ProduitsSlugRoute: typeof ProduitsSlugRoute
   ProduitsIndexRoute: typeof ProduitsIndexRoute
 }
@@ -87,6 +154,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/a-propos': {
+      id: '/a-propos'
+      path: '/a-propos'
+      fullPath: '/a-propos'
+      preLoaderRoute: typeof AProposRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favoris': {
+      id: '/favoris'
+      path: '/favoris'
+      fullPath: '/favoris'
+      preLoaderRoute: typeof FavorisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gaming': {
@@ -101,6 +189,13 @@ declare module '@tanstack/react-router' {
       path: '/laptops'
       fullPath: '/laptops'
       preLoaderRoute: typeof LaptopsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/panier': {
+      id: '/panier'
+      path: '/panier'
+      fullPath: '/panier'
+      preLoaderRoute: typeof PanierRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/produits/': {
@@ -122,8 +217,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AProposRoute: AProposRoute,
+  ContactRoute: ContactRoute,
+  FavorisRoute: FavorisRoute,
   GamingRoute: GamingRoute,
   LaptopsRoute: LaptopsRoute,
+  PanierRoute: PanierRoute,
   ProduitsSlugRoute: ProduitsSlugRoute,
   ProduitsIndexRoute: ProduitsIndexRoute,
 }
