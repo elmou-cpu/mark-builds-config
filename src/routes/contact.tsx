@@ -51,7 +51,7 @@ function ContactPage() {
 
   return (
     <div className="container py-10">
-      <Breadcrumbs items={[{ label: "Accueil", to: "/" }, { label: "Contact" }]} />
+      <Breadcrumbs items={[{ label: "Contact" }]} />
       <h1 className="mt-4 text-3xl font-bold sm:text-4xl">Nous contacter</h1>
       <p className="mt-3 max-w-xl text-sm text-muted-foreground">
         Une question sur un produit, un devis ou une réparation ? Passez au magasin, appelez-nous ou

@@ -8,7 +8,7 @@ export function ProductSpecs({ specifications }: { specifications: Record<string
     );
   }
   return (
-    <dl className="grid gap-0 sm:grid-cols-2">
+    <dl className="grid gap-x-10 sm:grid-cols-2">
       {entries.map(([key, value]) => (
         <div
           key={key}

@@ -31,7 +31,7 @@ function WishlistPage() {
 
   return (
     <div className="container py-10">
-      <Breadcrumbs items={[{ label: "Accueil", to: "/" }, { label: "Favoris" }]} />
+      <Breadcrumbs items={[{ label: "Favoris" }]} />
       <h1 className="mt-4 text-3xl font-bold sm:text-4xl">Mes favoris</h1>
       <p className="mt-3 text-sm text-muted-foreground">
         {wishlistItems.length} produit{wishlistItems.length > 1 ? "s" : ""} enregistré

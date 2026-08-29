@@ -75,7 +75,7 @@ function CartPage() {
 
   return (
     <div className="container py-10">
-      <Breadcrumbs items={[{ label: "Accueil", to: "/" }, { label: "Panier" }]} />
+      <Breadcrumbs items={[{ label: "Panier" }]} />
       <h1 className="mt-4 text-3xl font-bold sm:text-4xl">Votre panier</h1>
 
       {cartItems.length === 0 ? (
