@@ -36,7 +36,7 @@ function CatalogPage() {
 
   return (
     <div className="container py-10">
-      <Breadcrumbs items={[{ label: "Accueil", to: "/" }, { label: "Produits" }]} />
+      <Breadcrumbs items={[{ label: "Produits" }]} />
       <h1 className="mt-4 text-3xl font-bold sm:text-4xl">
         {category ? categoryMap[category as keyof typeof categoryMap].name : "Catalogue"}
       </h1>

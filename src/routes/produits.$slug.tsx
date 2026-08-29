@@ -64,7 +64,6 @@ function ProductPage() {
     <div className="container py-10">
       <Breadcrumbs
         items={[
-          { label: "Accueil", to: "/" },
           { label: "Produits", to: "/produits" },
           { label: product.name },
         ]}

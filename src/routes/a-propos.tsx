@@ -46,7 +46,7 @@ function AboutPage() {
         <img src={img.parts} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-25" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/50" />
         <div className="container relative py-14">
-          <Breadcrumbs items={[{ label: "Accueil", to: "/" }, { label: "À propos" }]} />
+          <Breadcrumbs items={[{ label: "À propos" }]} />
           <h1 className="mt-5 max-w-2xl text-3xl font-bold sm:text-4xl">
             Le hardware, c'est notre métier depuis l'atelier de {site.city}
           </h1>
