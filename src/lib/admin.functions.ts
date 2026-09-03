@@ -61,15 +61,18 @@ export const listAdminProducts = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     const { mapProducts } = await import("./catalog.server");
-    const rows = data ?? [];
-    const products = await mapProducts(rows);
-    return products.map((product, index) => ({
-      ...product,
-      active: rows[index].active,
-      imagePath: rows[index].image_path,
-      imageUrl: rows[index].image_url,
-      updatedAt: rows[index].updated_at,
-    }));
+    const rows = (data ?? []) as Array<Record<string, any>>;
+    const products = await mapProducts(rows as any);
+    return products.map((product, index) => {
+      const row = rows[index] ?? {};
+      return {
+        ...product,
+        active: row["active"] === true,
+        imagePath: (row["image_path"] as string | null) ?? null,
+        imageUrl: (row["image_url"] as string | null) ?? null,
+        updatedAt: (row["updated_at"] as string | undefined) ?? "",
+      };
+    });
   });
 
 export const saveProduct = createServerFn({ method: "POST" })
