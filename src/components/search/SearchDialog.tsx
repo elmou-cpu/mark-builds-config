@@ -11,7 +11,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { products } from "@/data/products";
+import { useProductsSafe } from "@/lib/catalog-query";
 import { matchesSearch } from "@/components/catalog/filters";
 import { formatPrice } from "@/lib/format";
 
@@ -28,6 +28,7 @@ export function SearchDialog({
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [recent, setRecent] = useState<string[]>([]);
+  const products = useProductsSafe();
 
   useEffect(() => {
     try {

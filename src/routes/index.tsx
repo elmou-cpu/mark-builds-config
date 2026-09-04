@@ -7,7 +7,12 @@ import { CategoryCard } from "@/components/common/CategoryCard";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { ReviewCard } from "@/components/common/ReviewCard";
 import { categoryMap, homeCategoryIds } from "@/data/categories";
-import { dealProducts, featuredProducts, productsByCategory } from "@/data/products";
+import {
+  byCategoryOf,
+  catalogQueryOptions,
+  featuredOf,
+  useProducts,
+} from "@/lib/catalog-query";
 import { reviews, ratingSummary } from "@/data/reviews";
 import { brands } from "@/data/brands";
 import { site } from "@/data/site";
@@ -32,6 +37,9 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "/" }],
   }),
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(catalogQueryOptions);
+  },
   component: Home,
 });
 
@@ -43,7 +51,9 @@ const trust = [
 ];
 
 function Home() {
-  const gamingPcs = productsByCategory("pc-gaming").slice(0, 4);
+  const products = useProducts();
+  const featuredProducts = featuredOf(products);
+  const gamingPcs = byCategoryOf(products, "pc-gaming").slice(0, 4);
 
   return (
     <>

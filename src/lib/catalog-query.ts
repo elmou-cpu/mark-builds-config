@@ -1,4 +1,4 @@
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 import type { Product } from "@/data/types";
 import { getCatalog, type CatalogPayload } from "./catalog.functions";
@@ -30,3 +30,8 @@ export const byCategoryOf = (products: Product[], categoryId: string) =>
 
 export const bySlugOf = (products: Product[], slug: string) =>
   products.find((p) => p.slug === slug);
+
+/** Non-suspending variant for always-mounted UI (header search, cart provider). */
+export function useProductsSafe(): Product[] {
+  return useQuery(catalogQueryOptions).data?.products ?? [];
+}
