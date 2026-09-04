@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { products } from "@/data/products";
+import { useProductsSafe } from "@/lib/catalog-query";
 import type { Product } from "@/data/types";
 
 export interface CartLine {
@@ -45,6 +45,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartLine[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const products = useProductsSafe();
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -129,6 +130,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       moveToCart,
     };
   }, [
+    products,
     cart,
     wishlist,
     cartOpen,

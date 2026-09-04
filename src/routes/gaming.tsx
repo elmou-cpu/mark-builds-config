@@ -4,7 +4,7 @@ import { ArrowRight, Gamepad2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { CatalogView } from "@/components/catalog/CatalogView";
-import { products } from "@/data/products";
+import { catalogQueryOptions, useProducts } from "@/lib/catalog-query";
 import { img } from "@/data/images";
 
 export const Route = createFileRoute("/gaming")({
@@ -25,6 +25,9 @@ export const Route = createFileRoute("/gaming")({
     ],
     links: [{ rel: "canonical", href: "/gaming" }],
   }),
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(catalogQueryOptions);
+  },
   component: GamingPage,
 });
 
@@ -37,6 +40,7 @@ const gamingCategories = [
 ];
 
 function GamingPage() {
+  const products = useProducts();
   const gaming = products.filter((p) => gamingCategories.includes(p.category));
 
   return (

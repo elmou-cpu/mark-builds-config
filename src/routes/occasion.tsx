@@ -3,7 +3,7 @@ import { RefreshCw, ShieldCheck, Wrench } from "lucide-react";
 
 import { CatalogView } from "@/components/catalog/CatalogView";
 import { SectionHeading } from "@/components/common/SectionHeading";
-import { usedProducts } from "@/data/products";
+import { catalogQueryOptions, usedOf, useProducts } from "@/lib/catalog-query";
 
 export const Route = createFileRoute("/occasion")({
   head: () => ({
@@ -23,6 +23,9 @@ export const Route = createFileRoute("/occasion")({
     ],
     links: [{ rel: "canonical", href: "/occasion" }],
   }),
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(catalogQueryOptions);
+  },
   component: UsedPage,
 });
 
@@ -37,6 +40,8 @@ const points = [
 ];
 
 function UsedPage() {
+  const usedProducts = usedOf(useProducts());
+
   return (
     <div className="container py-12">
       <h1 className="text-3xl font-bold sm:text-4xl">Matériel d'occasion</h1>

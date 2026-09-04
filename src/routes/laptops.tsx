@@ -3,7 +3,7 @@ import { Laptop } from "lucide-react";
 
 import { CatalogView } from "@/components/catalog/CatalogView";
 import { SectionHeading } from "@/components/common/SectionHeading";
-import { productsByCategory } from "@/data/products";
+import { byCategoryOf, catalogQueryOptions, useProducts } from "@/lib/catalog-query";
 import { img } from "@/data/images";
 
 export const Route = createFileRoute("/laptops")({
@@ -24,11 +24,14 @@ export const Route = createFileRoute("/laptops")({
     ],
     links: [{ rel: "canonical", href: "/laptops" }],
   }),
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(catalogQueryOptions);
+  },
   component: LaptopsPage,
 });
 
 function LaptopsPage() {
-  const laptops = productsByCategory("laptops");
+  const laptops = byCategoryOf(useProducts(), "laptops");
 
   return (
     <div>

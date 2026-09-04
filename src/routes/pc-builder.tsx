@@ -28,7 +28,7 @@ import {
   selectionTotal,
   type Selection,
 } from "@/lib/compatibility";
-import { productBySlug } from "@/data/products";
+import { bySlugOf, catalogQueryOptions, useProducts } from "@/lib/catalog-query";
 import { useShop } from "@/store/shop";
 import { site } from "@/data/site";
 
@@ -51,10 +51,14 @@ export const Route = createFileRoute("/pc-builder")({
     ],
     links: [{ rel: "canonical", href: "/pc-builder" }],
   }),
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(catalogQueryOptions);
+  },
   component: BuilderPage,
 });
 
 function BuilderPage() {
+  const catalogProducts = useProducts();
   const [selection, setSelection] = useState<Selection>({});
   const [activeStep, setActiveStep] = useState<StepId>("cpu");
   const { addToCart, setCartOpen } = useShop();
@@ -90,7 +94,7 @@ function BuilderPage() {
       .filter((s): s is string => Boolean(s));
     let added = 0;
     for (const slug of slugs) {
-      const product = productBySlug(slug);
+      const product = bySlugOf(catalogProducts, slug);
       if (product) {
         addToCart(product.id);
         added += 1;

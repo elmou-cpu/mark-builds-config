@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { CatalogView } from "@/components/catalog/CatalogView";
 import { Breadcrumbs } from "@/components/common/Breadcrumbs";
-import { products } from "@/data/products";
+import { catalogQueryOptions, useProducts } from "@/lib/catalog-query";
 import { categoryMap } from "@/data/categories";
 
 export const Route = createFileRoute("/produits/")({
@@ -27,10 +27,14 @@ export const Route = createFileRoute("/produits/")({
     ],
     links: [{ rel: "canonical", href: "/produits" }],
   }),
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(catalogQueryOptions);
+  },
   component: CatalogPage,
 });
 
 function CatalogPage() {
+  const products = useProducts();
   const { q, categorie } = Route.useSearch();
   const category = categorie && categorie in categoryMap ? categorie : undefined;
 

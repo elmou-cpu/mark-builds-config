@@ -13,15 +13,16 @@ import { ProductGrid } from "@/components/product/ProductGrid";
 import { DiscountBadge, ProductBadge, StatusBadge } from "@/components/product/ProductBadge";
 import { ReviewCard } from "@/components/common/ReviewCard";
 import { discountPercent, formatPrice } from "@/lib/format";
-import { products, productBySlug } from "@/data/products";
+import { bySlugOf, catalogQueryOptions, useProducts } from "@/lib/catalog-query";
 import { categoryMap } from "@/data/categories";
 import { reviews } from "@/data/reviews";
 import { site } from "@/data/site";
 import { useShop } from "@/store/shop";
 
 export const Route = createFileRoute("/produits/$slug")({
-  loader: ({ params }) => {
-    const product = productBySlug(params.slug);
+  loader: async ({ params, context }) => {
+    const catalog = await context.queryClient.ensureQueryData(catalogQueryOptions);
+    const product = bySlugOf(catalog.products, params.slug);
     if (!product) throw notFound();
     return { product };
   },
@@ -49,7 +50,10 @@ export const Route = createFileRoute("/produits/$slug")({
 });
 
 function ProductPage() {
-  const { product } = Route.useLoaderData();
+  const { slug } = Route.useParams();
+  const products = useProducts();
+  const loaded = Route.useLoaderData();
+  const product = bySlugOf(products, slug) ?? loaded.product;
   const { addToCart, toggleWishlist, isWishlisted, setCartOpen } = useShop();
   const [quantity, setQuantity] = useState(1);
   const wished = isWishlisted(product.id);
