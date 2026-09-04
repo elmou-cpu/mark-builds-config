@@ -3,7 +3,7 @@ import { Tag } from "lucide-react";
 
 import { CatalogView } from "@/components/catalog/CatalogView";
 import { SectionHeading } from "@/components/common/SectionHeading";
-import { dealProducts } from "@/data/products";
+import { catalogQueryOptions, dealsOf, useProducts } from "@/lib/catalog-query";
 
 export const Route = createFileRoute("/promotions")({
   head: () => ({
@@ -23,10 +23,15 @@ export const Route = createFileRoute("/promotions")({
     ],
     links: [{ rel: "canonical", href: "/promotions" }],
   }),
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(catalogQueryOptions);
+  },
   component: DealsPage,
 });
 
 function DealsPage() {
+  const dealProducts = dealsOf(useProducts());
+
   return (
     <div className="container py-12">
       <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-3 py-1 text-xs text-muted-foreground">
