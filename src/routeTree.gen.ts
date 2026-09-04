@@ -19,6 +19,7 @@ import { Route as OccasionRouteImport } from './routes/occasion'
 import { Route as PanierRouteImport } from './routes/panier'
 import { Route as PcBuilderRouteImport } from './routes/pc-builder'
 import { Route as PromotionsRouteImport } from './routes/promotions'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as ProduitsIndexRouteImport } from './routes/produits.index'
 import { Route as ProduitsSlugRouteImport } from './routes/produits.$slug'
 
@@ -72,6 +73,11 @@ const PromotionsRoute = PromotionsRouteImport.update({
   path: '/promotions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProduitsIndexRoute = ProduitsIndexRouteImport.update({
   id: '/produits/',
   path: '/produits/',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/panier': typeof PanierRoute
   '/pc-builder': typeof PcBuilderRoute
   '/promotions': typeof PromotionsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/produits/': typeof ProduitsIndexRoute
 }
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/panier': typeof PanierRoute
   '/pc-builder': typeof PcBuilderRoute
   '/promotions': typeof PromotionsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/produits': typeof ProduitsIndexRoute
 }
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/panier': typeof PanierRoute
   '/pc-builder': typeof PcBuilderRoute
   '/promotions': typeof PromotionsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/produits/': typeof ProduitsIndexRoute
 }
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/panier'
     | '/pc-builder'
     | '/promotions'
+    | '/admin/login'
     | '/produits/$slug'
     | '/produits/'
   fileRoutesByTo: FileRoutesByTo
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/panier'
     | '/pc-builder'
     | '/promotions'
+    | '/admin/login'
     | '/produits/$slug'
     | '/produits'
   id:
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/panier'
     | '/pc-builder'
     | '/promotions'
+    | '/admin/login'
     | '/produits/$slug'
     | '/produits/'
   fileRoutesById: FileRoutesById
@@ -182,6 +194,7 @@ export interface RootRouteChildren {
   PanierRoute: typeof PanierRoute
   PcBuilderRoute: typeof PcBuilderRoute
   PromotionsRoute: typeof PromotionsRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   ProduitsSlugRoute: typeof ProduitsSlugRoute
   ProduitsIndexRoute: typeof ProduitsIndexRoute
 }
@@ -258,6 +271,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromotionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/produits/': {
       id: '/produits/'
       path: '/produits'
@@ -286,6 +306,7 @@ const rootRouteChildren: RootRouteChildren = {
   PanierRoute: PanierRoute,
   PcBuilderRoute: PcBuilderRoute,
   PromotionsRoute: PromotionsRoute,
+  AdminLoginRoute: AdminLoginRoute,
   ProduitsSlugRoute: ProduitsSlugRoute,
   ProduitsIndexRoute: ProduitsIndexRoute,
 }
