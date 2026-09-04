@@ -10,6 +10,7 @@ import { categoryMap, homeCategoryIds } from "@/data/categories";
 import {
   byCategoryOf,
   catalogQueryOptions,
+  dealsOf,
   featuredOf,
   useProducts,
 } from "@/lib/catalog-query";
@@ -53,6 +54,7 @@ const trust = [
 function Home() {
   const products = useProducts();
   const featuredProducts = featuredOf(products);
+  const dealProducts = dealsOf(products);
   const gamingPcs = byCategoryOf(products, "pc-gaming").slice(0, 4);
 
   return (
