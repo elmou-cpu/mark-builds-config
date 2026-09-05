@@ -29,16 +29,40 @@ function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<"signin" | "setup">("signin");
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
+
+    if (mode === "setup") {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin + "/admin/login" },
+      });
+      if (error) {
+        setLoading(false);
+        toast.error("Création impossible", { description: error.message });
+        return;
+      }
+    }
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
     if (error) {
-      toast.error("Connexion impossible", { description: "Email ou mot de passe incorrect." });
+      setLoading(false);
+      toast.error("Connexion impossible", {
+        description:
+          mode === "setup"
+            ? "Compte créé. Confirmez votre email puis connectez-vous."
+            : "Email ou mot de passe incorrect.",
+      });
       return;
     }
+
+    // One-time setup: the first account created becomes the store administrator.
+    await supabase.rpc("claim_first_admin");
+    setLoading(false);
     toast.success("Connecté");
     navigate({ to: "/admin", replace: true });
   };
@@ -78,8 +102,18 @@ function AdminLogin() {
             />
           </div>
           <Button type="submit" variant="hero" className="w-full" disabled={loading}>
-            {loading && <Loader2 className="animate-spin" />} Se connecter
+            {loading && <Loader2 className="animate-spin" />}{" "}
+            {mode === "setup" ? "Créer le compte administrateur" : "Se connecter"}
           </Button>
+          <button
+            type="button"
+            className="w-full text-center text-xs text-muted-foreground underline-offset-4 hover:underline"
+            onClick={() => setMode(mode === "setup" ? "signin" : "setup")}
+          >
+            {mode === "setup"
+              ? "J'ai déjà un compte — me connecter"
+              : "Première utilisation : créer le compte administrateur"}
+          </button>
         </form>
       </div>
     </div>
