@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { Loader2, Lock } from "lucide-react";
 import { toast } from "sonner";
@@ -7,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { adminSignIn, requestPasswordReset } from "@/lib/auth.functions";
+import { toSafeMessage } from "@/lib/errors";
 
 export const Route = createFileRoute("/admin/login")({
   ssr: false,
@@ -26,45 +29,44 @@ export const Route = createFileRoute("/admin/login")({
 
 function AdminLogin() {
   const navigate = useNavigate();
+  const signIn = useServerFn(adminSignIn);
+  const resetPassword = useServerFn(requestPasswordReset);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<"signin" | "setup">("signin");
+  const [mode, setMode] = useState<"signin" | "reset">("signin");
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
-
-    if (mode === "setup") {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: window.location.origin + "/admin/login" },
-      });
-      if (error) {
-        setLoading(false);
-        toast.error("Création impossible", { description: error.message });
+    try {
+      if (mode === "reset") {
+        await resetPassword({
+          data: { email, redirectTo: `${window.location.origin}/admin/login` },
+        });
+        toast.success("Demande envoyée", {
+          description:
+            "Si un compte existe pour cette adresse, un lien de réinitialisation vient d'être envoyé.",
+        });
+        setMode("signin");
         return;
       }
-    }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setLoading(false);
-      toast.error("Connexion impossible", {
-        description:
-          mode === "setup"
-            ? "Compte créé. Confirmez votre email puis connectez-vous."
-            : "Email ou mot de passe incorrect.",
+      const session = await signIn({ data: { email, password } });
+      const { error } = await supabase.auth.setSession({
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
       });
-      return;
+      if (error) throw error;
+      toast.success("Connecté");
+      navigate({ to: "/admin", replace: true });
+    } catch (error) {
+      toast.error(mode === "reset" ? "Demande impossible" : "Connexion impossible", {
+        description: toSafeMessage(error, "Email ou mot de passe incorrect."),
+      });
+    } finally {
+      setLoading(false);
     }
-
-    // One-time setup: the first account created becomes the store administrator.
-    await supabase.rpc("claim_first_admin");
-    setLoading(false);
-    toast.success("Connecté");
-    navigate({ to: "/admin", replace: true });
   };
 
   return (
@@ -75,7 +77,9 @@ function AdminLogin() {
         </div>
         <h1 className="mt-5 text-2xl font-bold">Espace administration</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Accès réservé à l'équipe Mark Computer.
+          {mode === "reset"
+            ? "Saisissez votre adresse email pour recevoir un lien de réinitialisation."
+            : "Accès réservé à l'équipe Mark Computer."}
         </p>
 
         <form onSubmit={submit} className="mt-8 space-y-4">
@@ -90,29 +94,30 @@ function AdminLogin() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+          {mode === "signin" && (
+            <div className="space-y-2">
+              <Label htmlFor="password">Mot de passe</Label>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          )}
           <Button type="submit" variant="hero" className="w-full" disabled={loading}>
             {loading && <Loader2 className="animate-spin" />}{" "}
-            {mode === "setup" ? "Créer le compte administrateur" : "Se connecter"}
+            {mode === "reset" ? "Envoyer le lien" : "Se connecter"}
           </Button>
           <button
             type="button"
             className="w-full text-center text-xs text-muted-foreground underline-offset-4 hover:underline"
-            onClick={() => setMode(mode === "setup" ? "signin" : "setup")}
+            onClick={() => setMode(mode === "reset" ? "signin" : "reset")}
           >
-            {mode === "setup"
-              ? "J'ai déjà un compte — me connecter"
-              : "Première utilisation : créer le compte administrateur"}
+            {mode === "reset" ? "Retour à la connexion" : "Mot de passe oublié ?"}
           </button>
         </form>
       </div>
