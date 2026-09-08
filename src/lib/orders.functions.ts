@@ -188,7 +188,7 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
     }
     if (Object.keys(patch).length === 0) return { ok: true };
 
-    const { error } = await context.supabase.from("orders").update(patch).eq("id", data.id);
+    const { error } = await context.supabase.from("orders").update(patch as never).eq("id", data.id);
     if (error) rethrowSafe(error, "La commande n'a pas pu être mise à jour.");
 
     await logAudit(context, {
