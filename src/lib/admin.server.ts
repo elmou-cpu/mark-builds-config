@@ -1,3 +1,4 @@
+import { getRequestHeader } from "@tanstack/react-start/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/integrations/supabase/types";
@@ -64,9 +65,6 @@ export async function logAudit(
 /** Client IP as reported by the edge, used for rate-limit buckets only. */
 export function clientIp(): string {
   try {
-    const { getRequestHeader } = require("@tanstack/react-start/server") as {
-      getRequestHeader: (name: string) => string | undefined;
-    };
     const forwarded = getRequestHeader("x-forwarded-for") ?? "";
     return forwarded.split(",")[0]?.trim() || "unknown";
   } catch {
