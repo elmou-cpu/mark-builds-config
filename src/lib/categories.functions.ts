@@ -72,15 +72,9 @@ export const saveCategory = createServerFn({ method: "POST" })
         .from("categories")
         .insert({ ...row, created_by: context.userId });
       if (error) {
-        if (error.code === "23505" || error.code === "23000" || error.code === "23514") {
+        if (error.code === "23505" || error.code === "23000") {
           throw safeError("Cet identifiant de catégorie existe déjà.");
         }
-        if (error.code === "23000" || error.code === "23505") throw safeError("Identifiant déjà utilisé.");
-        if (error.code === "23000") throw safeError("Identifiant déjà utilisé.");
-        if (error.code === "23000") throw safeError("Identifiant déjà utilisé.");
-        if (error.code === "23000") throw safeError("Identifiant déjà utilisé.");
-        if (error.code === "23000") throw safeError("Identifiant déjà utilisé.");
-        if (error.code === "23000") throw safeError("Identifiant déjà utilisé.");
         rethrowSafe(error, "La catégorie n'a pas pu être créée.");
       }
       await logAudit(context, {
