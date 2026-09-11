@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckCircle2, Info, ShoppingBag } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { CheckCircle2, Info, Loader2, ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,20 +16,23 @@ import { CartItemRow } from "@/components/cart/CartDrawer";
 import { formatPrice } from "@/lib/format";
 import { useShop } from "@/store/shop";
 import { site } from "@/data/site";
+import { placeOrder } from "@/lib/orders.functions";
+import { getPublicStoreSettings } from "@/lib/settings.functions";
+import { toSafeMessage } from "@/lib/errors";
 
 export const Route = createFileRoute("/panier")({
   head: () => ({
     meta: [
-      { title: "Panier & demande de commande — Mark Computer" },
+      { title: "Panier & commande — Mark Computer" },
       {
         name: "description",
         content:
-          "Vérifiez votre sélection de matériel et envoyez votre demande de commande à Mark Computer Blida : retrait en magasin ou livraison.",
+          "Vérifiez votre sélection de matériel et envoyez votre commande à Mark Computer Blida : retrait en magasin ou livraison, paiement sur place.",
       },
       { property: "og:title", content: "Panier — Mark Computer" },
       {
         property: "og:description",
-        content: "Finalisez votre demande de commande : retrait en magasin ou livraison.",
+        content: "Finalisez votre commande : retrait en magasin ou livraison.",
       },
       { property: "og:url", content: "/panier" },
       { name: "robots", content: "noindex" },
@@ -36,29 +42,99 @@ export const Route = createFileRoute("/panier")({
   component: CartPage,
 });
 
-const DELIVERY_FEE = 1200;
+interface Confirmation {
+  orderNumber: string;
+  total: number;
+  shippingFee: number;
+}
 
 function CartPage() {
   const { cartItems, cartTotal, clearCart } = useShop();
-  const [mode, setMode] = useState("retrait");
-  const [step, setStep] = useState<"panier" | "coordonnees" | "confirme">("panier");
-  const [reference, setReference] = useState("");
+  const submitOrder = useServerFn(placeOrder);
+  const fetchSettings = useServerFn(getPublicStoreSettings);
 
-  const shipping = mode === "livraison" ? DELIVERY_FEE : 0;
+  const settingsQuery = useQuery({
+    queryKey: ["store-settings"],
+    queryFn: () => fetchSettings(),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const [mode, setMode] = useState("retrait");
+  const [step, setStep] = useState<"panier" | "coordonnees">("panier");
+  const [submitting, setSubmitting] = useState(false);
+  const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
+  const [form, setForm] = useState({
+    fullName: "",
+    phone: "",
+    email: "",
+    wilaya: "",
+    address: "",
+    notes: "",
+  });
+
+  const deliveryFee = settingsQuery.data?.deliveryFee ?? 1200;
+  const freeThreshold = settingsQuery.data?.freeDeliveryThreshold ?? null;
+  const shipping =
+    mode === "livraison" && !(freeThreshold !== null && cartTotal >= freeThreshold)
+      ? deliveryFee
+      : 0;
   const total = cartTotal + shipping;
 
-  if (step === "confirme") {
+  const update = (key: keyof typeof form) => (event: { target: { value: string } }) =>
+    setForm((prev) => ({ ...prev, [key]: event.target.value }));
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSubmitting(true);
+    try {
+      const result = await submitOrder({
+        data: {
+          items: cartItems.map(({ product, quantity }) => ({
+            productId: product.id,
+            quantity,
+          })),
+          customer: {
+            fullName: form.fullName,
+            phone: form.phone,
+            email: form.email,
+            wilaya: form.wilaya,
+            address: form.address,
+            notes: form.notes,
+            deliveryMode: mode === "livraison" ? "livraison" : "retrait",
+          },
+        },
+      });
+      clearCart();
+      setConfirmation({
+        orderNumber: result.orderNumber,
+        total: result.total,
+        shippingFee: result.shippingFee,
+      });
+    } catch (error) {
+      toast.error("Commande non enregistrée", {
+        description: toSafeMessage(error, "Veuillez vérifier votre panier et réessayer."),
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (confirmation) {
     return (
       <div className="container py-16">
         <div className="mx-auto max-w-lg rounded-2xl border border-border bg-surface/50 p-8 text-center">
           <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
-          <h1 className="mt-5 text-2xl font-bold">Demande enregistrée</h1>
+          <h1 className="mt-5 text-2xl font-bold">Commande enregistrée</h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            Référence <span className="font-semibold text-foreground">{reference}</span>. Un
-            conseiller vous rappelle au {site.phoneLocal} pour confirmer disponibilité et paiement.
+            Numéro de commande{" "}
+            <span className="font-semibold text-foreground">{confirmation.orderNumber}</span> — total{" "}
+            <span className="font-semibold text-foreground">{formatPrice(confirmation.total)}</span>.
+            Un conseiller vous rappelle au {site.phoneLocal} pour confirmer la disponibilité et le
+            retrait.
           </p>
           <p className="mt-4 rounded-lg border border-border bg-surface-2/60 p-3 text-xs text-muted-foreground">
-            Simulation de commande : aucun paiement n'a été effectué et aucune donnée n'est transmise.
+            Le paiement se fait en magasin au retrait, ou à la réception en cas de livraison. Aucun
+            paiement en ligne n'est demandé.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-2">
             <Button variant="hero" asChild>
@@ -106,32 +182,80 @@ function CartPage() {
                 </Button>
               </>
             ) : (
-              <form
-                className="rounded-xl border border-border bg-surface/40 p-6"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setReference(`MC-${Math.floor(100000 + Math.random() * 899999)}`);
-                  clearCart();
-                  setStep("confirme");
-                }}
-              >
+              <form className="rounded-xl border border-border bg-surface/40 p-6" onSubmit={submit}>
                 <h2 className="font-display text-lg font-bold">Vos coordonnées</h2>
                 <div className="mt-5 grid gap-5 sm:grid-cols-2">
                   <div className="grid gap-2">
                     <Label htmlFor="fullname">Nom complet</Label>
-                    <Input id="fullname" required placeholder="Votre nom" />
+                    <Input
+                      id="fullname"
+                      required
+                      minLength={2}
+                      maxLength={120}
+                      placeholder="Votre nom"
+                      value={form.fullName}
+                      onChange={update("fullName")}
+                    />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="tel">Téléphone</Label>
-                    <Input id="tel" required placeholder="0X XX XX XX XX" />
+                    <Input
+                      id="tel"
+                      required
+                      minLength={6}
+                      maxLength={30}
+                      placeholder="0X XX XX XX XX"
+                      value={form.phone}
+                      onChange={update("phone")}
+                    />
                   </div>
-                  <div className="grid gap-2 sm:col-span-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email (optionnel)</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      maxLength={200}
+                      placeholder="vous@exemple.com"
+                      value={form.email}
+                      onChange={update("email")}
+                    />
+                  </div>
+                  <div className="grid gap-2">
                     <Label htmlFor="wilaya">Wilaya</Label>
-                    <Input id="wilaya" required placeholder="Blida" />
+                    <Input
+                      id="wilaya"
+                      required
+                      minLength={2}
+                      maxLength={60}
+                      placeholder="Blida"
+                      value={form.wilaya}
+                      onChange={update("wilaya")}
+                    />
                   </div>
+                  {mode === "livraison" && (
+                    <div className="grid gap-2 sm:col-span-2">
+                      <Label htmlFor="address">Adresse de livraison</Label>
+                      <Input
+                        id="address"
+                        required
+                        minLength={5}
+                        maxLength={300}
+                        placeholder="Rue, quartier, ville"
+                        value={form.address}
+                        onChange={update("address")}
+                      />
+                    </div>
+                  )}
                   <div className="grid gap-2 sm:col-span-2">
                     <Label htmlFor="notes">Note (optionnel)</Label>
-                    <Textarea id="notes" rows={4} placeholder="Précisions sur votre commande…" />
+                    <Textarea
+                      id="notes"
+                      rows={4}
+                      maxLength={1000}
+                      placeholder="Précisions sur votre commande…"
+                      value={form.notes}
+                      onChange={update("notes")}
+                    />
                   </div>
                 </div>
 
@@ -149,7 +273,7 @@ function CartPage() {
                       <RadioGroupItem value="livraison" id="livraison" className="mt-0.5" />
                       <span>
                         <span className="block text-sm font-medium">
-                          Livraison — {formatPrice(DELIVERY_FEE)}
+                          Livraison — {formatPrice(deliveryFee)}
                         </span>
                         <span className="block text-xs text-muted-foreground">
                           Vers les {site.wilayas} wilayas, paiement à la réception.
@@ -160,8 +284,8 @@ function CartPage() {
                 </div>
 
                 <div className="mt-6 flex flex-wrap gap-2">
-                  <Button variant="hero" size="lg" type="submit">
-                    Confirmer la demande
+                  <Button variant="hero" size="lg" type="submit" disabled={submitting}>
+                    {submitting && <Loader2 className="animate-spin" />} Confirmer la commande
                   </Button>
                   <Button variant="ghost" type="button" onClick={() => setStep("panier")}>
                     Retour au panier
@@ -190,15 +314,20 @@ function CartPage() {
               </div>
 
               {step === "panier" && (
-                <Button variant="hero" size="lg" className="mt-5 w-full" onClick={() => setStep("coordonnees")}>
+                <Button
+                  variant="hero"
+                  size="lg"
+                  className="mt-5 w-full"
+                  onClick={() => setStep("coordonnees")}
+                >
                   Passer à la commande
                 </Button>
               )}
 
               <p className="mt-4 flex gap-2 text-xs text-muted-foreground">
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                Paiement en magasin ou à la livraison. Ce site est une démonstration : aucun paiement
-                en ligne n'est traité.
+                Le montant est recalculé par nos serveurs à l'enregistrement de la commande. Paiement
+                en magasin ou à la livraison.
               </p>
             </div>
           </aside>
