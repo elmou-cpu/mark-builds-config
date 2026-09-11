@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { rethrowSafe, safeError } from "./errors";
 import type { AdminProduct } from "./catalog-types";
 
 const productSchema = z.object({
@@ -18,6 +19,7 @@ const productSchema = z.object({
   oldPrice: z.number().min(0).nullable(),
   description: z.string().max(4000).default(""),
   stock: z.number().int().min(0),
+  lowStockThreshold: z.number().int().min(0).max(1000).default(3),
   status: z.enum(["disponible", "rupture", "sur-commande", "configuration", "nous-contacter"]),
   condition: z.enum(["neuf", "occasion", "comme-neuf"]),
   badge: z.string().max(40).nullable(),
@@ -37,18 +39,11 @@ export const getAdminStatus = createServerFn({ method: "GET" })
       _user_id: context.userId,
       _role: "admin",
     });
-    if (error) throw new Error(error.message);
+    if (error) rethrowSafe(error, "Impossible de vérifier vos droits.");
     return { isAdmin: data === true, userId: context.userId };
   });
 
-async function assertAdmin(context: { supabase: any; userId: string }) {
-  const { data, error } = await context.supabase.rpc("has_role", {
-    _user_id: context.userId,
-    _role: "admin",
-  });
-  if (error) throw new Error(error.message);
-  if (data !== true) throw new Error("Accès refusé");
-}
+import { assertAdmin, logAudit } from "./admin.server";
 
 /** Every product, including inactive ones — admins only. */
 export const listAdminProducts = createServerFn({ method: "GET" })
@@ -59,7 +54,7 @@ export const listAdminProducts = createServerFn({ method: "GET" })
       .from("products")
       .select("*")
       .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
+    if (error) rethrowSafe(error, "Impossible de charger les produits.");
     const { mapProducts } = await import("./catalog.server");
     const rows = (data ?? []) as Array<Record<string, any>>;
     const products = await mapProducts(rows as any);
@@ -71,6 +66,7 @@ export const listAdminProducts = createServerFn({ method: "GET" })
         imagePath: (row["image_path"] as string | null) ?? null,
         imageUrl: (row["image_url"] as string | null) ?? null,
         updatedAt: (row["updated_at"] as string | undefined) ?? "",
+        lowStockThreshold: Number(row["low_stock_threshold"] ?? 3),
       };
     });
   });
@@ -99,20 +95,59 @@ export const saveProduct = createServerFn({ method: "POST" })
       image_path: data.imagePath,
       image_paths: data.imagePath ? [data.imagePath] : [],
       specifications: data.specifications,
+      low_stock_threshold: data.lowStockThreshold,
+      updated_by: context.userId,
     };
 
     if (data.id) {
-      const { error } = await context.supabase.from("products").update(row).eq("id", data.id);
-      if (error) throw new Error(error.message);
+      const { data: before } = await context.supabase
+        .from("products")
+        .select("*")
+        .eq("id", data.id)
+        .maybeSingle();
+
+      const { error } = await context.supabase
+        .from("products")
+        .update(row as never)
+        .eq("id", data.id);
+      if (error) {
+        if (error.code === "23505") throw safeError("Cette référence d'URL est déjà utilisée.");
+        rethrowSafe(error, "Le produit n'a pas pu être enregistré.");
+      }
+
+      const previousPath = (before as { image_path?: string | null } | null)?.image_path ?? null;
+      if (previousPath && previousPath !== data.imagePath) {
+        const { removeOrphanImage } = await import("./uploads.functions");
+        await removeOrphanImage(previousPath);
+      }
+
+      await logAudit(context, {
+        action: "product.update",
+        entityType: "product",
+        entityId: data.id,
+        entityLabel: data.name,
+        before,
+        after: row,
+      });
       return { id: data.id };
     }
 
     const { data: inserted, error } = await context.supabase
       .from("products")
-      .insert(row)
+      .insert({ ...row, created_by: context.userId } as never)
       .select("id")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) {
+      if (error.code === "23505") throw safeError("Cette référence d'URL est déjà utilisée.");
+      rethrowSafe(error, "Le produit n'a pas pu être créé.");
+    }
+    await logAudit(context, {
+      action: "product.create",
+      entityType: "product",
+      entityId: inserted.id as string,
+      entityLabel: data.name,
+      after: row,
+    });
     return { id: inserted.id as string };
   });
 
@@ -121,8 +156,26 @@ export const deleteProduct = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
+    const { data: before } = await context.supabase
+      .from("products")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
+
     const { error } = await context.supabase.from("products").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) rethrowSafe(error, "Le produit n'a pas pu être supprimé.");
+
+    const path = (before as { image_path?: string | null } | null)?.image_path ?? null;
+    const { removeOrphanImage } = await import("./uploads.functions");
+    await removeOrphanImage(path);
+
+    await logAudit(context, {
+      action: "product.delete",
+      entityType: "product",
+      entityId: data.id,
+      entityLabel: (before as { name?: string } | null)?.name ?? "",
+      before,
+    });
     return { ok: true };
   });
 

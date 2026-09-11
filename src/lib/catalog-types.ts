@@ -6,6 +6,7 @@ export interface AdminProduct extends Product {
   imagePath: string | null;
   imageUrl: string | null;
   updatedAt: string;
+  lowStockThreshold: number;
 }
 
 export interface ProductInput {

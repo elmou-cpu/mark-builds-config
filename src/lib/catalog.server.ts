@@ -4,7 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 import type { CategoryId, Product, ProductCondition, ProductStatus } from "@/data/types";
 
 export const PRODUCT_BUCKET = "product-images";
-const SIGN_TTL = 60 * 60 * 24 * 7;
+const SIGN_TTL = 60 * 60; // 1 hour: hidden products stop being reachable quickly
 
 export type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
