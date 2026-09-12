@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Clock, Mail, MapPin, Phone, Send } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Clock, Loader2, Mail, MapPin, Phone, Send } from "lucide-react";
 import { toast } from "sonner";
+
+import { submitContactMessage } from "@/lib/contact.functions";
+import { toSafeMessage } from "@/lib/errors";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +52,31 @@ const subjects = [
 
 function ContactPage() {
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [subject, setSubject] = useState(subjects[0]!);
+  const [form, setForm] = useState({ fullName: "", phone: "", email: "", message: "" });
+  const send = useServerFn(submitContactMessage);
+
+  const update = (key: keyof typeof form) => (event: { target: { value: string } }) =>
+    setForm((prev) => ({ ...prev, [key]: event.target.value }));
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSubmitting(true);
+    try {
+      await send({ data: { ...form, subject } });
+      setSent(true);
+      setForm({ fullName: "", phone: "", email: "", message: "" });
+      toast.success("Message envoyé. Nous vous répondons sous 24 h.");
+    } catch (error) {
+      toast.error("Message non envoyé", {
+        description: toSafeMessage(error, "Veuillez réessayer dans quelques instants."),
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
 
   return (
     <div className="container py-10">
@@ -59,30 +88,46 @@ function ContactPage() {
       </p>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <form
-          className="rounded-xl border border-border bg-surface/50 p-6"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setSent(true);
-            toast.success("Message envoyé (démonstration). Nous vous répondons sous 24 h.");
-          }}
-        >
+        <form className="rounded-xl border border-border bg-surface/50 p-6" onSubmit={submit}>
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="name">Nom complet</Label>
-              <Input id="name" name="name" required placeholder="Votre nom" />
+              <Input
+                id="name"
+                required
+                minLength={2}
+                maxLength={120}
+                placeholder="Votre nom"
+                value={form.fullName}
+                onChange={update("fullName")}
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="phone">Téléphone</Label>
-              <Input id="phone" name="phone" required placeholder="0X XX XX XX XX" />
+              <Input
+                id="phone"
+                required
+                maxLength={30}
+                placeholder="0X XX XX XX XX"
+                value={form.phone}
+                onChange={update("phone")}
+              />
             </div>
             <div className="grid gap-2 sm:col-span-2">
               <Label htmlFor="email">E-mail</Label>
-              <Input id="email" name="email" type="email" placeholder="vous@exemple.com" />
+              <Input
+                id="email"
+                type="email"
+                required
+                maxLength={200}
+                placeholder="vous@exemple.com"
+                value={form.email}
+                onChange={update("email")}
+              />
             </div>
             <div className="grid gap-2 sm:col-span-2">
               <Label htmlFor="subject">Sujet</Label>
-              <Select defaultValue="Demande de devis">
+              <Select value={subject} onValueChange={setSubject}>
                 <SelectTrigger id="subject">
                   <SelectValue />
                 </SelectTrigger>
@@ -99,20 +144,29 @@ function ContactPage() {
               <Label htmlFor="message">Message</Label>
               <Textarea
                 id="message"
-                name="message"
                 required
+                minLength={10}
+                maxLength={4000}
                 rows={6}
                 placeholder="Décrivez votre besoin, votre budget ou la panne constatée…"
+                value={form.message}
+                onChange={update("message")}
               />
             </div>
           </div>
 
-          <Button variant="hero" size="lg" type="submit" className="mt-6 w-full sm:w-auto">
-            <Send /> Envoyer le message
+          <Button
+            variant="hero"
+            size="lg"
+            type="submit"
+            className="mt-6 w-full sm:w-auto"
+            disabled={submitting}
+          >
+            {submitting ? <Loader2 className="animate-spin" /> : <Send />} Envoyer le message
           </Button>
           {sent && (
             <p className="mt-4 text-sm text-success">
-              Merci ! Votre demande a été enregistrée (démonstration, aucun e-mail n'est envoyé).
+              Merci ! Votre demande a bien été enregistrée, nous revenons vers vous rapidement.
             </p>
           )}
         </form>
