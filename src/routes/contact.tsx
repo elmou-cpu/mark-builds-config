@@ -52,6 +52,31 @@ const subjects = [
 
 function ContactPage() {
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [subject, setSubject] = useState(subjects[0]!);
+  const [form, setForm] = useState({ fullName: "", phone: "", email: "", message: "" });
+  const send = useServerFn(submitContactMessage);
+
+  const update = (key: keyof typeof form) => (event: { target: { value: string } }) =>
+    setForm((prev) => ({ ...prev, [key]: event.target.value }));
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSubmitting(true);
+    try {
+      await send({ data: { ...form, subject } });
+      setSent(true);
+      setForm({ fullName: "", phone: "", email: "", message: "" });
+      toast.success("Message envoyé. Nous vous répondons sous 24 h.");
+    } catch (error) {
+      toast.error("Message non envoyé", {
+        description: toSafeMessage(error, "Veuillez réessayer dans quelques instants."),
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
 
   return (
     <div className="container py-10">
