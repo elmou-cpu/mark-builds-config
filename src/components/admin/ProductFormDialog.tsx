@@ -24,8 +24,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
-import { getImagePreview, saveProduct } from "@/lib/admin.functions";
+import { saveProduct } from "@/lib/admin.functions";
+import { uploadProductImage, MAX_IMAGE_BYTES } from "@/lib/uploads.functions";
 import {
   PRODUCT_CONDITIONS,
   PRODUCT_STATUSES,
@@ -47,6 +47,7 @@ interface FormState {
   oldPrice: string;
   description: string;
   stock: string;
+  lowStockThreshold: string;
   status: string;
   condition: string;
   badge: string;
@@ -67,6 +68,7 @@ const emptyForm = (categoryId: string): FormState => ({
   oldPrice: "",
   description: "",
   stock: "0",
+  lowStockThreshold: "3",
   status: "disponible",
   condition: "neuf",
   badge: "",
@@ -87,6 +89,7 @@ const fromProduct = (product: AdminProduct): FormState => ({
   oldPrice: product.oldPrice ? String(product.oldPrice) : "",
   description: product.description,
   stock: String(product.stock),
+  lowStockThreshold: String(product.lowStockThreshold),
   status: product.status,
   condition: product.condition,
   badge: product.badge ?? "",
@@ -111,7 +114,7 @@ export function ProductFormDialog({
 }) {
   const queryClient = useQueryClient();
   const save = useServerFn(saveProduct);
-  const preview = useServerFn(getImagePreview);
+  const upload = useServerFn(uploadProductImage);
   const [form, setForm] = useState<FormState>(emptyForm(categories[0]?.id ?? ""));
   const [uploading, setUploading] = useState(false);
 
@@ -142,6 +145,7 @@ export function ProductFormDialog({
           oldPrice: form.oldPrice.trim() ? Number(form.oldPrice) : null,
           description: form.description,
           stock,
+          lowStockThreshold: Number(form.lowStockThreshold),
           status: form.status as never,
           condition: form.condition as never,
           badge: form.badge.trim() ? form.badge.trim() : null,
@@ -171,13 +175,14 @@ export function ProductFormDialog({
   const uploadImage = async (file: File) => {
     setUploading(true);
     try {
-      const extension = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-      const path = `products/${crypto.randomUUID()}.${extension}`;
-      const { error } = await supabase.storage
-        .from("product-images")
-        .upload(path, file, { upsert: false, contentType: file.type });
-      if (error) throw error;
-      const { url } = await preview({ data: { path } });
+      if (file.size > MAX_IMAGE_BYTES) throw new Error("Image trop lourde (5 Mo maximum).");
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result).split(",")[1] ?? "");
+        reader.onerror = () => reject(new Error("Fichier illisible."));
+        reader.readAsDataURL(file);
+      });
+      const { path, url } = await upload({ data: { base64 } });
       set("imagePath", path);
       set("imageUrl", url);
       toast.success("Image téléversée");
@@ -261,6 +266,11 @@ export function ProductFormDialog({
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="lowStockThreshold">Seuil de stock faible</Label>
+            <Input id="lowStockThreshold" type="number" min={0} max={1000} value={form.lowStockThreshold} onChange={(e) => set("lowStockThreshold", e.target.value)} />
+          </div>
+
+          <div className="space-y-2">
             <Label>Disponibilité</Label>
             <Select value={form.status} onValueChange={(v) => set("status", v)}>
               <SelectTrigger>
@@ -332,7 +342,7 @@ export function ProductFormDialog({
               <div className="space-y-2">
                 <Input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp"
                   disabled={uploading}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
@@ -340,7 +350,7 @@ export function ProductFormDialog({
                   }}
                 />
                 <p className="text-xs text-muted-foreground">
-                  {uploading ? "Téléversement en cours…" : "JPG ou PNG, 10 Mo maximum."}
+                  {uploading ? "Téléversement en cours…" : "JPEG, PNG ou WebP, 5 Mo maximum."}
                 </p>
               </div>
             </div>
@@ -367,7 +377,7 @@ export function ProductFormDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Annuler
           </Button>
-          <Button variant="hero" onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+          <Button variant="hero" onClick={() => mutation.mutate()} disabled={mutation.isPending || uploading}>
             {mutation.isPending && <Loader2 className="animate-spin" />} Enregistrer
           </Button>
         </DialogFooter>
