@@ -1,0 +1,11 @@
+# Production readiness
+- [ ] Administration: orders, messages, categories, staff, settings, activity, low stock.
+- [ ] Secure product image form and stock controls.
+- [ ] Security hardening and direct adversarial checks.
+- [ ] Password recovery and invitation completion.
+- [ ] Security headers and public-page metadata.
+- [ ] Legal drafts, real business information, robots and sitemap.
+- [ ] Verify guest order/contact persistence and administration end to end.
+- [ ] Dependency security update and deployment notes.
+- [ ] Email notifications — blocked until an owned sender domain is configured.
+- [ ] Confirm backup/restore, monitoring and environment separation with the owner.

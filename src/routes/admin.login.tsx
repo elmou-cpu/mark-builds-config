@@ -42,7 +42,7 @@ function AdminLogin() {
     try {
       if (mode === "reset") {
         await resetPassword({
-          data: { email, redirectTo: `${window.location.origin}/admin/login` },
+          data: { email, redirectTo: `${window.location.origin}/admin/recovery` },
         });
         toast.success("Demande envoyée", {
           description:

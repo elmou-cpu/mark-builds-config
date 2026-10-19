@@ -19,6 +19,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ProductFormDialog } from "@/components/admin/ProductFormDialog";
+import { AdminNav } from "@/components/admin/AdminNav";
+import { listAdminCategories } from "@/lib/categories.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { deleteProduct, listAdminProducts } from "@/lib/admin.functions";
 import { catalogQueryOptions } from "@/lib/catalog-query";
@@ -50,6 +52,8 @@ function AdminDashboard() {
   const queryClient = useQueryClient();
   const fetchProducts = useServerFn(listAdminProducts);
   const removeProduct = useServerFn(deleteProduct);
+  const fetchCategories = useServerFn(listAdminCategories);
+  const [lowStockOnly, setLowStockOnly] = useState(false);
 
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<AdminProduct | null>(null);
@@ -62,7 +66,7 @@ function AdminDashboard() {
     retry: false,
   });
 
-  const categoriesQuery = useQuery(catalogQueryOptions);
+  const categoriesQuery = useQuery({ queryKey: ["admin", "categories"], queryFn: () => fetchCategories(), retry: false });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => removeProduct({ data: { id } }),
@@ -109,19 +113,21 @@ function AdminDashboard() {
 
   const products = productsQuery.data ?? [];
   const term = search.trim().toLowerCase();
-  const filtered = term
+  const searched = term
     ? products.filter((p) =>
         `${p.name} ${p.brand} ${p.sku}`.toLowerCase().includes(term),
       )
     : products;
+  const filtered = lowStockOnly ? searched.filter(p => p.stock <= p.lowStockThreshold) : searched;
 
-  const categories = (categoriesQuery.data?.categories ?? []).map((c) => ({
+  const categories = (categoriesQuery.data ?? []).map((c) => ({
     id: c.id,
     name: c.name,
   }));
 
   return (
     <div className="container py-10">
+      <AdminNav />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-3 py-1 text-xs text-muted-foreground">
@@ -148,12 +154,14 @@ function AdminDashboard() {
         </div>
       </div>
 
-      <div className="mt-8 max-w-sm">
+      <div className="mt-8 flex flex-wrap gap-3">
         <Input
+          className="max-w-sm"
           placeholder="Rechercher un produit…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        <Button variant={lowStockOnly ? "secondary" : "outline"} onClick={() => setLowStockOnly(v => !v)} aria-pressed={lowStockOnly}>Stock faible ({products.filter(p => p.stock <= p.lowStockThreshold).length})</Button>
       </div>
 
       {/* Mobile: cards. Desktop: table. */}
