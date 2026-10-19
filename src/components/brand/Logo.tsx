@@ -20,12 +20,7 @@ export function Logo({
       aria-label="Mark Computer — accueil"
       className={cn("group flex items-center gap-2.5", className)}
     >
-      <span className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg gradient-brand">
-        <span className="font-display text-[0.95rem] font-bold leading-none text-primary-foreground">
-          M
-        </span>
-        <span className="pointer-events-none absolute inset-0 opacity-40 [background:radial-gradient(circle_at_30%_20%,oklch(1_0_0/0.5),transparent_60%)]" />
-      </span>
+      <img src="/logo-mark.png" alt="Mark Computer" className="h-10 w-10 shrink-0 object-contain" />
       {!compact && (
         <span className="flex min-w-0 flex-col leading-none">
           <span className="font-display text-[1.02rem] font-bold tracking-tight">
