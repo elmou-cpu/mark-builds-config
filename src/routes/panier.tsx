@@ -36,6 +36,8 @@ export const Route = createFileRoute("/panier")({
       },
       { property: "og:url", content: "/panier" },
       { name: "robots", content: "noindex" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
     links: [{ rel: "canonical", href: "/panier" }],
   }),
@@ -79,6 +81,7 @@ function CartPage() {
       ? deliveryFee
       : 0;
   const total = cartTotal + shipping;
+  const invalidStock = cartItems.some(({ product, quantity }) => product.status !== "disponible" || product.stock < quantity || quantity < 1);
 
   const update = (key: keyof typeof form) => (event: { target: { value: string } }) =>
     setForm((prev) => ({ ...prev, [key]: event.target.value }));
@@ -129,8 +132,7 @@ function CartPage() {
             Numéro de commande{" "}
             <span className="font-semibold text-foreground">{confirmation.orderNumber}</span> — total{" "}
             <span className="font-semibold text-foreground">{formatPrice(confirmation.total)}</span>.
-            Un conseiller vous rappelle au {site.phoneLocal} pour confirmer la disponibilité et le
-            retrait.
+            Votre demande est transmise au magasin pour confirmation.
           </p>
           <p className="mt-4 rounded-lg border border-border bg-surface-2/60 p-3 text-xs text-muted-foreground">
             Le paiement se fait en magasin au retrait, ou à la réception en cas de livraison. Aucun
@@ -284,7 +286,7 @@ function CartPage() {
                 </div>
 
                 <div className="mt-6 flex flex-wrap gap-2">
-                  <Button variant="hero" size="lg" type="submit" disabled={submitting}>
+                  <Button variant="hero" size="lg" type="submit" disabled={submitting || invalidStock}>
                     {submitting && <Loader2 className="animate-spin" />} Confirmer la commande
                   </Button>
                   <Button variant="ghost" type="button" onClick={() => setStep("panier")}>
@@ -318,11 +320,13 @@ function CartPage() {
                   variant="hero"
                   size="lg"
                   className="mt-5 w-full"
+                  disabled={invalidStock}
                   onClick={() => setStep("coordonnees")}
                 >
                   Passer à la commande
                 </Button>
               )}
+              {invalidStock && <p role="alert" className="mt-4 text-sm text-destructive">Un produit est indisponible ou sa quantité dépasse le stock. Ajustez votre panier.</p>}
 
               <p className="mt-4 flex gap-2 text-xs text-muted-foreground">
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />

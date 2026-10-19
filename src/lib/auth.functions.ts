@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { safeError } from "./errors";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const credentialsSchema = z.object({
   email: z.string().email().max(200),
@@ -35,7 +36,7 @@ export const adminSignIn = createServerFn({ method: "POST" })
       password: data.password,
     });
 
-    if (error || !result.session) {
+    if (error || !result.session || !result.user) {
       throw safeError("Email ou mot de passe incorrect.");
     }
 
@@ -43,7 +44,7 @@ export const adminSignIn = createServerFn({ method: "POST" })
 
     // Only accounts holding the admin role may use this entry point.
     const { data: isAdmin } = await client.rpc("has_role", {
-      _user_id: result.user!.id,
+      _user_id: result.user.id,
       _role: "admin",
     });
     if (isAdmin !== true) {
@@ -64,6 +65,10 @@ export const adminSignIn = createServerFn({ method: "POST" })
 export const requestPasswordReset = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => emailSchema.parse(input))
   .handler(async ({ data }) => {
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const origin = new URL(getRequest().url).origin;
+    const redirect = new URL(data.redirectTo);
+    if (redirect.origin !== origin || redirect.pathname !== "/admin/recovery") throw safeError("Lien de retour invalide.");
     const { clientIp, throttle } = await import("./admin.server");
     const email = data.email.trim().toLowerCase();
     await throttle(`reset:ip:${clientIp()}`, 10, 900, 60);
@@ -72,10 +77,20 @@ export const requestPasswordReset = createServerFn({ method: "POST" })
     try {
       const { createPublicClient } = await import("./catalog.server");
       await createPublicClient().auth.resetPasswordForEmail(email, {
-        redirectTo: data.redirectTo,
+        redirectTo: redirect.href,
       });
     } catch (error) {
       console.error("[auth] reset request failed", error);
     }
     return { ok: true };
+  });
+
+export const completeAdminRecovery = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ password: z.string().min(12).max(200) }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.auth.updateUser({ password: data.password });
+    if (error) throw safeError("Le mot de passe n'a pas pu être enregistré.");
+    const { data: admin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    return { isAdmin: admin === true };
   });

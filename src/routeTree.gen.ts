@@ -20,7 +20,13 @@ import { Route as PanierRouteImport } from './routes/panier'
 import { Route as PcBuilderRouteImport } from './routes/pc-builder'
 import { Route as PromotionsRouteImport } from './routes/promotions'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminActivityRouteImport } from './routes/admin.activity'
+import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
+import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminStaffRouteImport } from './routes/admin.staff'
 import { Route as ProduitsIndexRouteImport } from './routes/produits.index'
 import { Route as ProduitsSlugRouteImport } from './routes/produits.$slug'
 
@@ -79,9 +85,39 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminActivityRoute = AdminActivityRouteImport.update({
+  id: '/admin/activity',
+  path: '/admin/activity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/admin/categories',
+  path: '/admin/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminMessagesRoute = AdminMessagesRouteImport.update({
+  id: '/admin/messages',
+  path: '/admin/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/admin/orders',
+  path: '/admin/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/admin/settings',
+  path: '/admin/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminStaffRoute = AdminStaffRouteImport.update({
+  id: '/admin/staff',
+  path: '/admin/staff',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProduitsIndexRoute = ProduitsIndexRouteImport.update({
@@ -106,7 +142,13 @@ export interface FileRoutesByFullPath {
   '/panier': typeof PanierRoute
   '/pc-builder': typeof PcBuilderRoute
   '/promotions': typeof PromotionsRoute
+  '/admin/activity': typeof AdminActivityRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/staff': typeof AdminStaffRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/produits/': typeof ProduitsIndexRoute
@@ -122,7 +164,13 @@ export interface FileRoutesByTo {
   '/panier': typeof PanierRoute
   '/pc-builder': typeof PcBuilderRoute
   '/promotions': typeof PromotionsRoute
+  '/admin/activity': typeof AdminActivityRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/staff': typeof AdminStaffRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/admin': typeof AdminIndexRoute
   '/produits': typeof ProduitsIndexRoute
@@ -139,7 +187,13 @@ export interface FileRoutesById {
   '/panier': typeof PanierRoute
   '/pc-builder': typeof PcBuilderRoute
   '/promotions': typeof PromotionsRoute
+  '/admin/activity': typeof AdminActivityRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/staff': typeof AdminStaffRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/produits/': typeof ProduitsIndexRoute
@@ -157,7 +211,13 @@ export interface FileRouteTypes {
     | '/panier'
     | '/pc-builder'
     | '/promotions'
+    | '/admin/activity'
+    | '/admin/categories'
     | '/admin/login'
+    | '/admin/messages'
+    | '/admin/orders'
+    | '/admin/settings'
+    | '/admin/staff'
     | '/produits/$slug'
     | '/admin/'
     | '/produits/'
@@ -173,7 +233,13 @@ export interface FileRouteTypes {
     | '/panier'
     | '/pc-builder'
     | '/promotions'
+    | '/admin/activity'
+    | '/admin/categories'
     | '/admin/login'
+    | '/admin/messages'
+    | '/admin/orders'
+    | '/admin/settings'
+    | '/admin/staff'
     | '/produits/$slug'
     | '/admin'
     | '/produits'
@@ -189,7 +255,13 @@ export interface FileRouteTypes {
     | '/panier'
     | '/pc-builder'
     | '/promotions'
+    | '/admin/activity'
+    | '/admin/categories'
     | '/admin/login'
+    | '/admin/messages'
+    | '/admin/orders'
+    | '/admin/settings'
+    | '/admin/staff'
     | '/produits/$slug'
     | '/admin/'
     | '/produits/'
@@ -206,7 +278,13 @@ export interface RootRouteChildren {
   PanierRoute: typeof PanierRoute
   PcBuilderRoute: typeof PcBuilderRoute
   PromotionsRoute: typeof PromotionsRoute
+  AdminActivityRoute: typeof AdminActivityRoute
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminMessagesRoute: typeof AdminMessagesRoute
+  AdminOrdersRoute: typeof AdminOrdersRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminStaffRoute: typeof AdminStaffRoute
   ProduitsSlugRoute: typeof ProduitsSlugRoute
   AdminIndexRoute: typeof AdminIndexRoute
   ProduitsIndexRoute: typeof ProduitsIndexRoute
@@ -291,11 +369,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/activity': {
+      id: '/admin/activity'
+      path: '/admin/activity'
+      fullPath: '/admin/activity'
+      preLoaderRoute: typeof AdminActivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/admin/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/admin/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/messages': {
+      id: '/admin/messages'
+      path: '/admin/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/orders': {
+      id: '/admin/orders'
+      path: '/admin/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/staff': {
+      id: '/admin/staff'
+      path: '/admin/staff'
+      fullPath: '/admin/staff'
+      preLoaderRoute: typeof AdminStaffRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/produits/': {
@@ -326,7 +446,13 @@ const rootRouteChildren: RootRouteChildren = {
   PanierRoute: PanierRoute,
   PcBuilderRoute: PcBuilderRoute,
   PromotionsRoute: PromotionsRoute,
+  AdminActivityRoute: AdminActivityRoute,
+  AdminCategoriesRoute: AdminCategoriesRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminMessagesRoute: AdminMessagesRoute,
+  AdminOrdersRoute: AdminOrdersRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminStaffRoute: AdminStaffRoute,
   ProduitsSlugRoute: ProduitsSlugRoute,
   AdminIndexRoute: AdminIndexRoute,
   ProduitsIndexRoute: ProduitsIndexRoute,

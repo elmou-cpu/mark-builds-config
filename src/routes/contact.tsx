@@ -36,6 +36,8 @@ export const Route = createFileRoute("/contact")({
         content: "Adresse, téléphone et horaires du magasin Mark Computer à Blida.",
       },
       { property: "og:url", content: "/contact" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "/contact" }],
   }),
@@ -53,7 +55,7 @@ const subjects = [
 function ContactPage() {
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [subject, setSubject] = useState(subjects[0]!);
+  const [subject, setSubject] = useState(subjects[0] ?? "Autre question");
   const [form, setForm] = useState({ fullName: "", phone: "", email: "", message: "" });
   const send = useServerFn(submitContactMessage);
 
@@ -67,7 +69,7 @@ function ContactPage() {
       await send({ data: { ...form, subject } });
       setSent(true);
       setForm({ fullName: "", phone: "", email: "", message: "" });
-      toast.success("Message envoyé. Nous vous répondons sous 24 h.");
+      toast.success("Votre message a bien été enregistré.");
     } catch (error) {
       toast.error("Message non envoyé", {
         description: toSafeMessage(error, "Veuillez réessayer dans quelques instants."),
